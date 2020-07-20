@@ -1,20 +1,16 @@
-pipeline {
-  agent any
-  stages {
-    stage('Lint HTML') {
-      steps {
-        sh 'tidy -q -e *.html'
-      }
+node {
+    def app
+
+    stage('Clone repository') {
+        /* Let's make sure we have the repository cloned to our workspace */
+
+        checkout scm
     }
 
-    stage('Upload to AWS') {
-      steps {
-        withAWS(region: 'us-west-1', credentials: 'aws-static') {
-          s3Upload(file: 'index.html', bucket: 'jenkinsbucket011')
-        }
+    stage('Build image') {
+        /* This builds the actual image; synonymous to
+         * docker build on the command line */
 
-      }
+        app = docker.build("myNginx")
     }
-
-  }
 }
